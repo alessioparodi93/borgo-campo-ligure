@@ -13,7 +13,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:#0f1f35;font-family:'Segoe UI',system-ui,sans-serif;color:#dde6f0;font-size:14px;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:#dde6f0;font-size:14px;-webkit-tap-highlight-color:transparent}
 input,select,textarea,button{font-family:inherit}
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:#0f1f35}
@@ -45,15 +45,28 @@ const ALL_ENTRATE = Object.values(CAT_ENTRATE).flat();
 const ALL_USCITE  = Object.values(CAT_USCITE).flat();
 const isGiroconto = voce => GIROCONTO_VOCI.includes(voce);
 
-const C = {
-  bg:"#0f1f35", surface:"#162d4a", border:"rgba(0,102,179,.25)", borderFaint:"rgba(255,255,255,.06)",
-  gold:"#0066b3", goldLight:"#3399ff", text:"#dde6f0", muted:"#6a8aaa",
-  green:"#27ae60", greenBg:"rgba(39,174,96,.13)", greenBorder:"rgba(39,174,96,.28)",
-  red:"#e74c3c", redBg:"rgba(231,76,60,.13)", redBorder:"rgba(231,76,60,.28)",
-  blue:"#0066b3", blueBg:"rgba(0,102,179,.13)", blueBorder:"rgba(0,102,179,.3)",
-  orange:"#e67e22", orangeBg:"rgba(230,126,34,.13)", orangeBorder:"rgba(230,126,34,.3)",
-  accent:"#2ecc71",
+
+const THEMES = {
+  dark: {
+    bg:"#0f1f35", surface:"#162d4a", border:"rgba(0,102,179,.25)", borderFaint:"rgba(255,255,255,.06)",
+    gold:"#0066b3", goldLight:"#3399ff", text:"#dde6f0", muted:"#6a8aaa",
+    green:"#27ae60", greenBg:"rgba(39,174,96,.13)", greenBorder:"rgba(39,174,96,.28)",
+    red:"#e74c3c", redBg:"rgba(231,76,60,.13)", redBorder:"rgba(231,76,60,.28)",
+    blue:"#0066b3", blueBg:"rgba(0,102,179,.13)", blueBorder:"rgba(0,102,179,.3)",
+    orange:"#e67e22", orangeBg:"rgba(230,126,34,.13)", orangeBorder:"rgba(230,126,34,.3)",
+    accent:"#2ecc71",
+  },
+  light: {
+    bg:"#f0f4f8", surface:"#ffffff", border:"rgba(0,102,179,.2)", borderFaint:"rgba(0,0,0,.08)",
+    gold:"#0066b3", goldLight:"#0052a3", text:"#1a2a3a", muted:"#5a7a9a",
+    green:"#1e8449", greenBg:"rgba(30,132,73,.1)", greenBorder:"rgba(30,132,73,.3)",
+    red:"#c0392b", redBg:"rgba(192,57,43,.1)", redBorder:"rgba(192,57,43,.3)",
+    blue:"#0066b3", blueBg:"rgba(0,102,179,.1)", blueBorder:"rgba(0,102,179,.3)",
+    orange:"#d35400", orangeBg:"rgba(211,84,0,.1)", orangeBorder:"rgba(211,84,0,.3)",
+    accent:"#1e8449",
+  }
 };
+let C = THEMES.dark;
 
 const isMobile = () => window.innerWidth < 768;
 const fmtDate = d => d ? d.slice(0,10).split("-").reverse().join("/") : "—";
@@ -129,9 +142,9 @@ function ConfirmDialog({msg,onConfirm,onCancel}){
     <div style={{background:C.surface,border:`1px solid ${C.border}`,borderRadius:16,padding:28,maxWidth:320,width:"100%",textAlign:"center",boxShadow:"0 20px 60px rgba(0,0,0,.6)"}}>
       <div style={{fontSize:44,marginBottom:12}}>⚠️</div>
       <div style={{fontSize:15,fontWeight:600,marginBottom:20,lineHeight:1.5}}>{msg}</div>
-      <div style={{display:"flex",gap:10}}>
-        <Btn color="ghost" full onClick={onCancel}>Annulla</Btn>
+      <div style={{display:"flex",flexDirection:"column",gap:10}}>
         <Btn color="red" full onClick={onConfirm}>🗑 Elimina</Btn>
+        <Btn color="ghost" full onClick={onCancel}>Annulla</Btn>
       </div>
     </div>
   </div>;
@@ -217,9 +230,9 @@ function MembroForm({data, tipo, onSave, onCancel, saving}){
           <span style={{fontSize:14,color:d.obsoleto?C.orange:C.text}}>🗄️ Obsoleto</span>
         </label>
       </div>
-      <div style={{display:"flex",gap:10}}>
-        <Btn color="ghost" full onClick={onCancel}>Annulla</Btn>
+      <div style={{display:"flex",flexDirection:"column",gap:10}}>
         <Btn color="blue" full onClick={()=>onSave(d)} disabled={saving}>{saving?"Salvataggio…":"💾 Salva"}</Btn>
+        <Btn color="ghost" full onClick={onCancel}>Annulla</Btn>
       </div>
     </div>
   );
@@ -276,11 +289,11 @@ function MovimentoForm({onSave, onCancel, saving}){
       <div><label style={{fontSize:11,color:C.muted,textTransform:"uppercase",display:"block",marginBottom:4}}>Descrizione (opzionale)</label>
         <input value={desc} onChange={e=>setDesc(e.target.value)} style={IS} placeholder="Note aggiuntive…"/>
       </div>
-      <div style={{display:"flex",gap:8}}>
-        <Btn full color="ghost" onClick={onCancel}>Annulla</Btn>
+      <div style={{display:"flex",flexDirection:"column",gap:10}}>
         <Btn full color={tipo==="entrata"?"green":"red"} onClick={()=>onSave({tipo,conto,voce,importo:parseFloat(importo)||0,data,descrizione:desc})} disabled={saving||!voce||!importo}>
           {saving?"…":`✓ Salva ${tipo==="entrata"?"Entrata":"Uscita"}`}
         </Btn>
+        <Btn full color="ghost" onClick={onCancel}>Annulla</Btn>
       </div>
     </div>
   );
@@ -445,6 +458,9 @@ function App(){
   const [dbError,setDbError]=useState(false);
   const [view,setView]=useState("dashboard");
   const [mobile,setMobile]=useState(isMobile());
+  const [tema,setTema]=useState('dark');
+  C = THEMES[tema];
+  useEffect(()=>{ document.body.style.background=C.bg; document.body.style.color=C.text; },[tema]);
 
   // Data
   const [giocatori,setGiocatori]=useState([]);
@@ -704,6 +720,7 @@ function App(){
               </nav>
               <div style={{display:"flex",alignItems:"center",gap:6,marginLeft:8,paddingLeft:8,borderLeft:`1px solid ${C.border}`}}>
                 <span style={{fontSize:10,fontWeight:700,padding:"3px 8px",borderRadius:12,background:isAdmin?"rgba(0,102,179,.2)":C.blueBg,color:C.goldLight}}>{isAdmin?"👑 Admin":"👁 Viewer"}</span>
+                <button onClick={()=>setTema(t=>t==="dark"?"light":"dark")} style={{background:"none",border:`1px solid ${C.border}`,color:C.muted,borderRadius:7,padding:"5px 9px",cursor:"pointer",fontSize:14}}>☀️</button>
                 <button onClick={()=>sb.auth.signOut()} style={{background:"none",border:`1px solid ${C.border}`,color:C.muted,borderRadius:7,padding:"5px 9px",cursor:"pointer",fontSize:11,fontWeight:700}}>Esci</button>
               </div>
             </div>
@@ -718,6 +735,7 @@ function App(){
             <img src={logo} alt="Logo" style={{height:36,width:"auto"}}/>
             <div style={{fontFamily:"Georgia,serif",fontSize:13,color:C.goldLight,fontWeight:700}}>"Il Borgo"</div>
           </div>
+          <button onClick={()=>setTema(t=>t==="dark"?"light":"dark")} style={{background:"none",border:`1px solid ${C.border}`,color:C.muted,borderRadius:7,padding:"5px 8px",cursor:"pointer",fontSize:14}}>☀️</button>
           <button onClick={()=>sb.auth.signOut()} style={{background:"none",border:`1px solid ${C.border}`,color:C.muted,borderRadius:7,padding:"5px 8px",cursor:"pointer",fontSize:11,fontWeight:700}}>Esci</button>
         </div>
       )}
@@ -976,9 +994,9 @@ function App(){
             <div style={{background:C.blueBg,border:`1px solid ${C.blueBorder}`,borderRadius:8,padding:"10px 14px",fontSize:12,color:C.goldLight}}>
               💡 Il PDF verrà aperto in una nuova finestra. Usa la stampa del browser per salvarlo.
             </div>
-            <div style={{display:"flex",gap:8}}>
-              <Btn full color="ghost" onClick={()=>setShowBilancio(false)}>Annulla</Btn>
+            <div style={{display:"flex",flexDirection:"column",gap:10}}>
               <Btn full color="blue" onClick={()=>{generaBilancio(movimenti,bilStagione,bilSaldoCassa,bilSaldoBanca,logo);setShowBilancio(false);}}>📄 Genera PDF</Btn>
+              <Btn full color="ghost" onClick={()=>setShowBilancio(false)}>Annulla</Btn>
             </div>
           </div>
         </Modal>
@@ -998,9 +1016,9 @@ function App(){
             <div><label style={{fontSize:11,color:C.muted,textTransform:"uppercase",display:"block",marginBottom:6}}>Conto</label>
               <select value={expConto} onChange={e=>setExpConto(e.target.value)} style={IS}><option value="tutti">Cassa + Banca</option><option value="cassa">Solo Cassa</option><option value="banca">Solo Banca</option></select>
             </div>
-            <div style={{display:"flex",gap:8}}>
-              <Btn full color="ghost" onClick={()=>setShowExport(false)}>Annulla</Btn>
+            <div style={{display:"flex",flexDirection:"column",gap:10}}>
               <Btn full color="blue" onClick={()=>{generaListaMovimenti(movimenti,expDA,expA,expTipo,expConto);setShowExport(false);}}>📋 Genera PDF</Btn>
+              <Btn full color="ghost" onClick={()=>setShowExport(false)}>Annulla</Btn>
             </div>
           </div>
         </Modal>
