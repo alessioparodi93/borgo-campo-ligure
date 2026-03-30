@@ -26,8 +26,8 @@ input,select,textarea,button{font-family:inherit}
 <script type="text/babel">
 const { useState, useEffect, useRef } = React;
 
-const SUPABASE_URL      = "INSERISCI_QUI_IL_TUO_URL";
-const SUPABASE_ANON_KEY = "INSERISCI_QUI_LA_TUA_ANON_KEY";
+const SUPABASE_URL      = "https://cnwezfreciczadrxmhxg.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_XbuOMKi6Capmm5yt4tt2Ng_tHs9YRu2";
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const fromDb = o => { if(!o) return o; const r={}; for(const [k,v] of Object.entries(o)) r[k.replace(/_([a-z])/g,(_,c)=>c.toUpperCase())]=v; return r; };
